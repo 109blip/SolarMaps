@@ -18,7 +18,8 @@
 
   "device": {
     "mode": "fnb58",
-    "wifi_interface": "wlan0"
+    "wifi_interface": "wlan0",
+    "stall_timeout_s": 10
   },
 
   "firebase": {

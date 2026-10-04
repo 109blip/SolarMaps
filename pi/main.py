@@ -38,7 +38,10 @@ def build_reader(device_cfg: dict, sample_interval_s: float):
     mode = device_cfg.get("mode", "simulator")
     if mode == "fnb58":
         # VID/PID(2e3c:5558)는 vendor/openfnb58/fnb58.py에 고정돼 있어 설정할 필요 없음.
-        return FNB58Reader(poll_interval_s=sample_interval_s)
+        return FNB58Reader(
+            poll_interval_s=sample_interval_s,
+            stall_timeout_s=device_cfg.get("stall_timeout_s", 10.0),
+        )
     if mode == "simulator":
         return SimulatorReader()
     sys.exit(f"알 수 없는 device.mode: {mode!r} (fnb58 | simulator)")
