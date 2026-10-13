@@ -70,7 +70,8 @@ M_FNB = mat("Guide_FNB58", (0.2, 0.45, 0.8, 1))
 M_PLUG = mat("Guide_Plug", (0.75, 0.75, 0.78, 1))
 M_PI = mat("Guide_Pi", (0.25, 0.6, 0.35, 1))
 M_PORT = mat("Guide_Port", (0.05, 0.05, 0.05, 1))
-CABLE_COLORS = {1: (1.0, 0.55, 0.0, 1), 2: (0.85, 0.1, 0.1, 1), 3: (0.1, 0.7, 0.2, 1), 4: (0.55, 0.2, 0.8, 1)}
+CABLE_COLORS = {1: (1.0, 0.55, 0.0, 1), 2: (0.85, 0.1, 0.1, 1), 3: (0.1, 0.7, 0.2, 1), 4: (0.55, 0.2, 0.8, 1),
+                5: (0.45, 0.45, 0.45, 1)}                  # 5 = 배터리 내장 케이블 (사용 안 함, 회색)
 
 ANCHORS = {}
 CUR = []
@@ -171,9 +172,13 @@ def render(name, res=(1600, 1200)):
     bpy.ops.render.render(write_still=True)
 
 
-# ---- 개략 부품 (build_case.py 의 REF_ 치수와 같음) ----
-PORT_Y_BATT = 149.4
-BATT_C, BATT_A = (25.0, PORT_Y_BATT), (50.0, PORT_Y_BATT)
+# ---- 개략 부품 (build_case.py 의 BATT_* 치수와 같음) ----
+BATT_W, BATT_L, BATT_T = C["BATT_W"], C["BATT_L"], C["BATT_T"]    # Anker Zolo A110E
+BATT_X0, BATT_Y0, BATT_Z0 = 1.0, 1.0, 2.0                          # 바닥·벽에서 살짝 띄운 위치
+PORT_Y_BATT = BATT_Y0 + BATT_L                                     # 포트는 +Y 짧은 면 (실물 사진 확인)
+BATT_PORT_Z = BATT_Z0 + BATT_T / 2                                 # 포트 높이는 두께 가운데 (사진으로 대략 추정)
+# 뒤에서 본 왼쪽→오른쪽: USB-A, USB-C, 내장 USB-C 케이블 (X 위치는 사진에서 대략 추정, ±3 mm)
+BATT_A, BATT_C, BATT_CABLE = (50.0, PORT_Y_BATT), (30.0, PORT_Y_BATT), (13.0, PORT_Y_BATT)
 FNB_X0, FNB_X1 = 98.0, 140.0
 FNB_CIN, FNB_COUT = (FNB_X0, 92.0), (FNB_X0, 125.0)
 FNB_PC = (FNB_X1, 100.0)
@@ -182,12 +187,12 @@ PI_PWR, PI_USB = (97.5, PI_Y), (110.0, PI_Y)
 
 
 def parts():
-    gbox("batt", 1, 74, 1, PORT_Y_BATT, 2, 17, M_BATT)
+    gbox("batt", BATT_X0, BATT_X0 + BATT_W, BATT_Y0, PORT_Y_BATT, BATT_Z0, BATT_Z0 + BATT_T, M_BATT)
     gbox("fnb", FNB_X0, FNB_X1, 77, 147, 2, 15, M_FNB)
     gbox("plug", 113, 125, 64.5, 77, 5, 9.5, M_PLUG)
     gbox("pi", 79.5, 158.5, 1, PI_Y, 2, 17, M_PI)
-    for x, y in (BATT_C, BATT_A):
-        gbox("port", x - 4.5, x + 4.5, y - 0.5, y + 1.0, 7, 11, M_PORT)
+    for x, y in (BATT_C, BATT_A, BATT_CABLE):
+        gbox("port", x - 4.5, x + 4.5, y - 0.5, y + 1.0, BATT_PORT_Z - 2, BATT_PORT_Z + 2, M_PORT)
     for x, y in (FNB_CIN, FNB_COUT):
         gbox("port", x - 1.0, x + 0.5, y - 4.5, y + 4.5, 6, 10, M_PORT)
     gbox("port", FNB_PC[0] - 0.5, FNB_PC[0] + 1.0, FNB_PC[1] - 4, FNB_PC[1] + 4, 6, 9, M_PORT)
@@ -198,12 +203,14 @@ def parts():
 # 권장 케이블 경로 (① 태양광→FNB58 입력, ② FNB58 출력→배터리, ③ FNB58 PC→Pi USB, ④ 배터리→Pi PWR)
 CABLES = {
     1: [(NX, 215, 14), (NX, IN_Y + 2, 12), (NX, 168, 12), (NX, 140, 8), (NX, 95, 8), (FNB_CIN[0] - 1, FNB_CIN[1], 8)],
-    2: [(FNB_COUT[0] - 1, FNB_COUT[1], 8), (93, FNB_COUT[1], 8), (93, 158, 10), (80, 160, 10), (30, 160, 10),
-        (BATT_C[0], 156, 9), (BATT_C[0], BATT_C[1] + 1, 9)],
+    2: [(FNB_COUT[0] - 1, FNB_COUT[1], 8), (93, FNB_COUT[1], 8), (93, 158, 10), (80, 160, 10), (30, 160, 12),
+        (BATT_C[0], 156, 14), (BATT_C[0], BATT_C[1] + 1, BATT_PORT_Z)],
     3: [(FNB_PC[0] + 1, FNB_PC[1], 8), (151, FNB_PC[1], 8), (151, 55, 8), (118, 50, 8), (PI_USB[0], 46, 8),
         (PI_USB[0], PI_USB[1] + 1, 8)],
-    4: [(BATT_A[0], BATT_A[1] + 1, 9), (BATT_A[0], 172, 5), (80, 172, 5), (80, 60, 5), (90, 52, 6),
+    4: [(BATT_A[0], BATT_A[1] + 1, BATT_PORT_Z), (BATT_A[0], 172, 9), (80, 172, 5), (80, 60, 5), (90, 52, 6),
         (PI_PWR[0], 46, 8), (PI_PWR[0], PI_PWR[1] + 1, 8)],
+    # 내장 케이블 (C타입, 이 설계에서는 사용 안 함): 짧은 면에서 나와 케이블 베이 안쪽으로 눕힌다
+    5: [(BATT_CABLE[0], BATT_CABLE[1] + 1, BATT_PORT_Z), (BATT_CABLE[0], 160, 4), (10, 176, 4)],
 }
 
 
@@ -283,6 +290,7 @@ callout("c2", (60, 160, 10))
 callout("c3", (151, 78, 8))
 callout("c4", (80, 88, 5))
 callout("panel", (NX, 208, 14))
+callout("builtin", (BATT_CABLE[0], 160, 4))
 render("c05_wiring", (1400, 1600))
 
 # 6. 뚜껑 아래면
