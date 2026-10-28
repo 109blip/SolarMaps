@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>SolarMaps — 최적 태양광 설치각 지도</title>
-  <meta name="description" content="위치와 쾨펜 기후 구분을 이용해 최적의 태양광 패널 설치 각도와 방향을 알려주는 지도" />
+  <title>SolarMaps — 최적 태양광 설치각 지도 & 학교 전력 자립률 시뮬레이터</title>
+  <meta name="description" content="위치와 쾨펜 기후 구분을 이용한 최적 태양광 패널 설치각 및 패널 개수·설치 면적별 학교 전력 자립률 시뮬레이터" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/theme.css?v=2" />
   <link rel="stylesheet" href="css/app.css?v=2" />
   <link rel="stylesheet" href="css/map.css?v=2" />
+  <link rel="stylesheet" href="css/simulator.css?v=2" />
 
   <style>
     .marker-pulse { animation: marker-pulse 1.6s ease-in-out infinite; }
@@ -29,7 +30,11 @@
     <div class="top-bar">
       <div>
         <h1>☀️ SolarMaps</h1>
-        <div class="subtitle">HAFS 유리프 — 위치·쾨펜 기후 기반 최적 태양광 설치각 계산</div>
+        <div class="subtitle">HAFS 유리프 — 위치·쾨펜 기후 기반 최적 설치각 & 학교 전력 자립률 계산</div>
+      </div>
+      <div class="nav-tabs-group">
+        <button id="nav-tab-map" class="nav-tab-btn active">🗺️ 설치각 지도</button>
+        <button id="nav-tab-sim" class="nav-tab-btn">⚡ 전력 자립률 시뮬레이터</button>
       </div>
     </div>
 
@@ -39,6 +44,7 @@
         <div id="result-panel" hidden></div>
         <div id="dashboard-panel"></div>
       </div>
+      <div id="simulator-overlay" class="simulator-overlay" hidden></div>
     </div>
   </div>
 
@@ -48,6 +54,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

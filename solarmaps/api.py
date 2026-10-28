@@ -20,6 +20,7 @@ from solarmaps.constants import (
 from solarmaps.koppen import KoppenGrid, load_grid
 from solarmaps.models import MonthlyClimate
 from solarmaps.optimizer import build_fallback_monthly_climate, optimize
+from solarmaps.simulation import calculate_school_self_sufficiency
 
 _grid: KoppenGrid | None = None
 
@@ -104,3 +105,28 @@ def analyze(
     payload["koppen"] = koppen
     payload["climate_params"] = asdict(get_climate_params(koppen_code))
     return payload
+
+
+def simulate_self_sufficiency(
+    *,
+    installation_area_m2: float,
+    panel_count: int,
+    panel_rated_w: float = 400.0,
+    panel_area_m2: float = 1.85,
+    monthly_consumption_kwh: float = 12500.0,
+    tilt_deg: float = 30.0,
+    azimuth_deg: float = 180.0,
+    monthly_psh_override: list[float] | None = None,
+) -> dict[str, Any]:
+    """학교 전력 자립률 시뮬레이션 진입점 (JSON/JS 직렬화 가능 dict 반환)."""
+    res = calculate_school_self_sufficiency(
+        installation_area_m2=installation_area_m2,
+        panel_count=panel_count,
+        panel_rated_w=panel_rated_w,
+        panel_area_m2=panel_area_m2,
+        monthly_consumption_kwh=monthly_consumption_kwh,
+        tilt_deg=tilt_deg,
+        azimuth_deg=azimuth_deg,
+        monthly_psh_override=monthly_psh_override,
+    )
+    return res.to_dict()

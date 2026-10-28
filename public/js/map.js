@@ -61,20 +61,31 @@ export function renderStationMarkers(map, stations, thresholds) {
   }
 }
 
-export function renderCampusPolygons(map, features) {
+export function renderCampusPolygons(map, features, onSelectBuilding) {
   return L.geoJSON(
     { type: "FeatureCollection", features },
     {
       style: { color: "var(--primary, #60a5fa)", weight: 1.5, fillOpacity: 0.08 },
       onEachFeature: (feature, layer) => {
         const p = feature.properties || {};
-        layer.bindPopup(`
+        const popupContent = document.createElement("div");
+        popupContent.style.minWidth = "180px";
+        popupContent.innerHTML = `
           <strong>${p.building_name ?? feature.id}</strong>
-          <div style="font-size:12px;margin-top:4px;">
-            유효 설치면적: ${p.usable_solar_area_m2 ?? "-"} m²<br/>
-            잠재 설비용량: ${p.potential_capacity_kw ?? "-"} kW
+          <div style="font-size:12px;margin:6px 0 8px;line-height:1.4;">
+            유효 설치면적: <strong>${p.usable_solar_area_m2 ?? "-"} m²</strong><br/>
+            잠재 설비용량: <strong>${p.potential_capacity_kw ?? "-"} kW</strong><br/>
+            월간 소비량: <strong>${p.monthly_consumption_kwh ? p.monthly_consumption_kwh.toLocaleString() + " kWh" : "-"}</strong>
           </div>
-        `);
+          <button class="btn btn-primary btn-sm bldg-sim-btn" style="width:100%;font-size:11px;padding:4px 8px;">
+            ⚡ 이 건물로 자립률 시뮬레이션
+          </button>
+        `;
+        const btn = popupContent.querySelector(".bldg-sim-btn");
+        if (btn && onSelectBuilding) {
+          btn.addEventListener("click", () => onSelectBuilding(p));
+        }
+        layer.bindPopup(popupContent);
       },
     }
   ).addTo(map);
