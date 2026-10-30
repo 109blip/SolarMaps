@@ -58,6 +58,20 @@ st.markdown(
 
 # 학교 건물 프리셋 데이터 (docs/DATA_SPEC.md 및 HAFS 유리프 실측 기준)
 CAMPUS_PRESETS = {
+    "HAFS 옥상 및 유휴지 전체 (3회 실측 평균) - B안(기숙사 중복 제외 61.2%)": {
+        "area": 7612.67,
+        "panels": 2057,
+        "monthly_kwh": 135865.9,
+        "desc": "HAFS 3회 실측(1차 7,606 / 2차 7,644 / 3차 7,588 m², 평균 7,612.67 m² ±0.38%) · 고지서 B안(기숙사 수전 중복 제외 월 135,866 kWh) 반영 시 자립률 약 60%",
+        "trials": [7606, 7644, 7588],
+    },
+    "HAFS 옥상 및 유휴지 전체 (3회 실측 평균) - A안(고지서 원본 표 합계 30.6%)": {
+        "area": 7612.67,
+        "panels": 2057,
+        "monthly_kwh": 271626.5,
+        "desc": "HAFS 3회 실측(평균 7,612.67 m²) · 고지서 A안(표 원본 8개월 2,173,012 kWh, 월 271,627 kWh) 반영 시 자립률 약 30%",
+        "trials": [7606, 7644, 7588],
+    },
     "본관 옥상 유휴지 (기본 실증지)": {
         "area": 550.0,
         "panels": 200,
@@ -75,12 +89,6 @@ CAMPUS_PRESETS = {
         "panels": 300,
         "monthly_kwh": 14000.0,
         "desc": "실내체육관 지붕 유휴공간 (유효면적 800m²)",
-    },
-    "전교 옥상 전면 설치 (Full Campus)": {
-        "area": 2200.0,
-        "panels": 800,
-        "monthly_kwh": 35000.0,
-        "desc": "본관·과학관·어학관·체육관 통합 설치 시뮬레이션",
     },
     "소형 실증 실험 1호기 (Stand)": {
         "area": 20.0,
@@ -105,12 +113,19 @@ preset_name = st.sidebar.selectbox("건물 / 구역 프리셋", list(CAMPUS_PRES
 preset_data = CAMPUS_PRESETS[preset_name]
 st.sidebar.info(preset_data["desc"])
 
+# HAFS 3회 실측치 배지 표시
+if "trials" in preset_data:
+    t1, t2, t3 = preset_data["trials"]
+    st.sidebar.success(
+        f"📊 **HAFS 3회 실측 데이터**\n- 1차: `{t1:,} m²`\n- 2차: `{t2:,} m²`\n- 3차: `{t3:,} m²`\n- **평균: `7,612.67 m²` (±28.6 m², 0.38%)**"
+    )
+
 # 2. 설치 면적 및 패널 개수 슬라이더
 st.sidebar.subheader("📐 설치 면적 및 패널 개수")
 install_area = st.sidebar.number_input(
     "설치 가능 면적 (m²)",
     min_value=10.0,
-    max_value=10000.0,
+    max_value=30000.0,
     value=float(preset_data["area"]),
     step=10.0,
     help="건물 옥상이나 유휴지에서 패널 설치가 가능한 유효 바닥 면적",
@@ -125,7 +140,7 @@ if st.sidebar.button("⚡ 면적 맞춤 최적 패널 수 자동 입력"):
 panel_count = st.sidebar.number_input(
     "설치할 패널 개수 (장)",
     min_value=1,
-    max_value=3000,
+    max_value=10000,
     value=st.session_state.get("panel_count_input", int(preset_data["panels"])),
     step=5,
     help=f"선택한 면적({install_area:.0f}m²) 기준 권장 최대 설치량은 약 {rec_max}장입니다.",
@@ -154,10 +169,10 @@ st.sidebar.subheader("🏫 학교 소비 전력")
 monthly_kwh = st.sidebar.number_input(
     "월평균 전기 소비량 (kWh)",
     min_value=500.0,
-    max_value=100000.0,
+    max_value=500000.0,
     value=float(preset_data["monthly_kwh"]),
     step=500.0,
-    help="학교의 한전 고지서 기준 월간 평균 전력 사용량 (기본 12,500 kWh)",
+    help="학교의 한전 고지서 기준 월간 평균 전력 사용량 (HAFS 실측 A안 271,627 kWh / B안 135,866 kWh)",
 )
 
 # 5. 설치 환경 (각도 및 단가)

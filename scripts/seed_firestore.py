@@ -25,7 +25,7 @@ STATIONS = [
         "building_id": "bldg_main",
         "building_name": "본관",
         "floor": 4,
-        "location": {"latitude": 37.501234, "longitude": 127.039876, "altitude_m": 18.5},
+        "location": {"latitude": 37.3338, "longitude": 127.2555, "altitude_m": 165.0},
         "hardware": {
             "panel_model": "Portable-Solar-30W",
             "rated_power_w": 30.0,
@@ -51,7 +51,7 @@ STATIONS = [
         "building_id": "bldg_field",
         "building_name": "운동장",
         "floor": 1,
-        "location": {"latitude": 37.501890, "longitude": 127.040500, "altitude_m": 0.0},
+        "location": {"latitude": 37.3345, "longitude": 127.2562, "altitude_m": 150.0},
         "hardware": {
             "panel_model": "Portable-Solar-30W",
             "rated_power_w": 30.0,
@@ -73,14 +73,16 @@ STATIONS = [
 ]
 
 CAMPUS_POLYGON = {
-    "id": "poly_bldg_main",
+    "id": "poly_hafs_measured_full",
     "properties": {
-        "building_name": "본관 옥상 유휴지",
+        "building_name": "HAFS 옥상 및 유휴지 (3회 실측 합계)",
         "total_roof_area_m2": 850.0,
-        "usable_solar_area_m2": 550.0,
+        "usable_solar_area_m2": 7612.67,
+        "measured_trials_m2": [7606, 7644, 7588],
+        "measured_std_m2": 28.59,
         "current_installed_stations": ["station_rooftop_main_01"],
-        "potential_capacity_kw": 82.5,
-        "monthly_consumption_kwh": 12500.0,
+        "potential_capacity_kw": 761.27,
+        "monthly_consumption_kwh": 135865.9,
     },
     "geometry": {
         "type": "Polygon",

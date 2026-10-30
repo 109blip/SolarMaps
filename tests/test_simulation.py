@@ -67,3 +67,35 @@ def test_api_simulate_self_sufficiency_dict_serializable() -> None:
     assert "monthly" in data
     assert "hourly" in data
     assert len(data["monthly"]) == 12
+
+
+def test_hafs_measured_area_and_self_sufficiency() -> None:
+    from solarmaps.simulation import (
+        HAFS_MEASURED_AREAS_M2,
+        HAFS_MEASURED_MEAN_AREA_M2,
+        HAFS_MEASURED_STD_AREA_M2,
+        HAFS_MONTHLY_CONSUMPTION_KWH_A,
+        HAFS_MONTHLY_CONSUMPTION_KWH_B,
+    )
+
+    # 3회 측정치 확인
+    assert HAFS_MEASURED_AREAS_M2 == [7606.0, 7644.0, 7588.0]
+    assert abs(HAFS_MEASURED_MEAN_AREA_M2 - 7612.67) < 0.01
+    assert abs(HAFS_MEASURED_STD_AREA_M2 - 28.59) < 0.01
+
+    # B안 (기숙사 제외: 135,865.9 kWh/월) 기준 시뮬레이션: 자립률 ~60%
+    res_b = calculate_school_self_sufficiency(
+        installation_area_m2=HAFS_MEASURED_MEAN_AREA_M2,
+        panel_count=2057,
+        monthly_consumption_kwh=HAFS_MONTHLY_CONSUMPTION_KWH_B,
+    )
+    assert res_b.annual_self_sufficiency_percent > 50.0
+
+    # A안 (표 원본: 271,626.5 kWh/월) 기준 시뮬레이션: 자립률 ~30%
+    res_a = calculate_school_self_sufficiency(
+        installation_area_m2=HAFS_MEASURED_MEAN_AREA_M2,
+        panel_count=2057,
+        monthly_consumption_kwh=HAFS_MONTHLY_CONSUMPTION_KWH_A,
+    )
+    assert res_a.annual_self_sufficiency_percent > 25.0
+

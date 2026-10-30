@@ -15,6 +15,20 @@ from typing import Any
 
 from solarmaps.constants import SYSTEM_LOSS_FRACTION
 
+# HAFS(용인한국외대부고) 옥상 및 유휴지 실측 데이터 (2026-10 실측 3회)
+# 1차: 7,606 m², 2차: 7,644 m², 3차: 7,588 m²
+HAFS_MEASURED_AREAS_M2: list[float] = [7606.0, 7644.0, 7588.0]
+HAFS_MEASURED_MEAN_AREA_M2: float = sum(HAFS_MEASURED_AREAS_M2) / len(HAFS_MEASURED_AREAS_M2)  # 7612.6666... m²
+HAFS_MEASURED_STD_AREA_M2: float = 28.5890421898554  # 표본 표준편차 (평균 대비 0.38%)
+
+# HAFS 8개월 전력 고지서 실측 데이터 (2025-12-17 ~ 2026-08-16, 243일)
+# A안: 고지서 표 원본 합계 (기숙사동 포함 2,173,012 kWh)
+# B안: 수전 중복 의심 기숙사동 행 제외 합계 (1,086,927 kWh)
+HAFS_8MONTH_CONSUMPTION_KWH_A: float = 2173012.0
+HAFS_8MONTH_CONSUMPTION_KWH_B: float = 1086927.0
+HAFS_MONTHLY_CONSUMPTION_KWH_A: float = HAFS_8MONTH_CONSUMPTION_KWH_A / 8.0  # 271,626.5 kWh/월
+HAFS_MONTHLY_CONSUMPTION_KWH_B: float = HAFS_8MONTH_CONSUMPTION_KWH_B / 8.0  # 135,865.875 kWh/월
+
 # 한국 주요 지역 월별 평균 일일 최적각 경사면 일조시간 (Peak Sun Hours, h/day)
 # NASA POWER 및 기상청 기후평년치(서울/경기 권역 경사각 30~33° 기준)
 DEFAULT_MONTHLY_PSH: list[float] = [

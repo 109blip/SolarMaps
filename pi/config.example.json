@@ -1,12 +1,12 @@
 {
   "station": {
-    "station_id": "station_rooftop_main_01",
-    "name": "본관 옥상 실험 1호기",
+    "station_id": "station_hafs_rooftop_01",
+    "name": "HAFS 본관 옥상 실증 1호기",
     "category": "ROOFTOP",
-    "building_id": "bldg_main",
-    "building_name": "본관",
+    "building_id": "bldg_hafs_main",
+    "building_name": "HAFS 본관 4층 옥상",
     "floor": 4,
-    "location": { "latitude": 37.501234, "longitude": 127.039876, "altitude_m": 18.5 },
+    "location": { "latitude": 37.3338, "longitude": 127.2555, "altitude_m": 165.0 },
     "hardware": {
       "panel_model": "Portable-Solar-30W",
       "rated_power_w": 30.0,

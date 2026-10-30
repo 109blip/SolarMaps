@@ -23,6 +23,22 @@ const HOURLY_SOLAR_RATIO = [
 ];
 
 const PRESETS = {
+  hafs_total: {
+    name: "HAFS 옥상·유휴지 전체 (3회 실측 평균)",
+    area: 7612.7,
+    panels: 2057,
+    monthlyKwh: 135866,
+    desc: "3회 실측(1차 7,606 / 2차 7,644 / 3차 7,588 m², 평균 7,612.7m²) · 고지서 B안(기숙사 수전 중복 제외 월 135,866 kWh) 자립률 ~60%",
+    trials: [7606, 7644, 7588],
+  },
+  hafs_scenario_a: {
+    name: "HAFS 전체 — 고지서 A안 (표 원본)",
+    area: 7612.7,
+    panels: 2057,
+    monthlyKwh: 271627,
+    desc: "3회 실측 평균 7,612.7m² · 고지서 A안(표 원본 8개월 2,173,012 kWh, 월 271,627 kWh) 자립률 ~30%",
+    trials: [7606, 7644, 7588],
+  },
   main_bldg: {
     name: "본관 옥상 유휴지",
     area: 550,
@@ -44,13 +60,6 @@ const PRESETS = {
     monthlyKwh: 14000,
     desc: "실내체육관 지붕 유휴공간 (유효면적 800m²)",
   },
-  full_campus: {
-    name: "전교 옥상 전면 설치",
-    area: 2200,
-    panels: 800,
-    monthlyKwh: 35000,
-    desc: "본관·과학동·어학관·체육관 통합 설치",
-  },
   stand_test: {
     name: "소형 실증 실험 1호기",
     area: 20,
@@ -71,12 +80,12 @@ export class SolarSimulator {
   constructor(containerEl) {
     this.container = containerEl;
     this.state = {
-      preset: "main_bldg",
-      areaM2: 550,
-      panelCount: 200,
+      preset: "hafs_total",
+      areaM2: 7612.7,
+      panelCount: 2057,
       panelRatedW: 400,
       panelAreaM2: 1.85,
-      monthlyConsumptionKwh: 12500,
+      monthlyConsumptionKwh: 135866,
       tiltDeg: 30,
       azimuthDeg: 180,
       elecRateKrw: 130,
@@ -131,9 +140,12 @@ export class SolarSimulator {
               <span class="control-hint">옥상/유휴지 유효면적</span>
             </div>
             <div class="control-input-row">
-              <input type="range" id="input-area-slider" class="control-slider" min="10" max="3000" step="10" value="${this.state.areaM2}" />
-              <input type="number" id="input-area-num" class="control-number-input" min="10" max="10000" step="10" value="${this.state.areaM2}" />
+              <input type="range" id="input-area-slider" class="control-slider" min="10" max="15000" step="10" value="${this.state.areaM2}" />
+              <input type="number" id="input-area-num" class="control-number-input" min="10" max="30000" step="10" value="${this.state.areaM2}" />
               <span class="control-unit">m²</span>
+            </div>
+            <div style="font-size:11px;color:#38bdf8;margin-top:4px;background:rgba(56,189,248,0.1);padding:4px 8px;border-radius:4px;">
+              📊 HAFS 3회 실측치: <strong>1차 7,606</strong> / <strong>2차 7,644</strong> / <strong>3차 7,588 m²</strong> (평균 7,612.7 m², ±0.38%)
             </div>
           </div>
 
@@ -144,15 +156,15 @@ export class SolarSimulator {
               <span class="control-hint">설치 수량</span>
             </div>
             <div class="control-input-row">
-              <input type="range" id="input-panels-slider" class="control-slider" min="1" max="1200" step="1" value="${this.state.panelCount}" />
-              <input type="number" id="input-panels-num" class="control-number-input" min="1" max="5000" step="1" value="${this.state.panelCount}" />
+              <input type="range" id="input-panels-slider" class="control-slider" min="1" max="5000" step="1" value="${this.state.panelCount}" />
+              <input type="number" id="input-panels-num" class="control-number-input" min="1" max="10000" step="1" value="${this.state.panelCount}" />
               <span class="control-unit">장</span>
             </div>
           </div>
 
           <!-- 면적 맞춤 자동 배치 버튼 -->
           <button id="btn-auto-fit-panels" class="auto-fit-btn">
-            ⚡ 면적 맞춤 권장 패널 수 자동 배치 (<span id="auto-fit-count-text">200</span>장)
+            ⚡ 면적 맞춤 권장 패널 수 자동 배치 (<span id="auto-fit-count-text">2057</span>장)
           </button>
 
           <!-- 면적 점유율 게이지 -->
@@ -189,9 +201,17 @@ export class SolarSimulator {
               <span class="control-hint">한전 고지서 기준</span>
             </div>
             <div class="control-input-row">
-              <input type="range" id="input-consumption-slider" class="control-slider" min="1000" max="50000" step="500" value="${this.state.monthlyConsumptionKwh}" />
-              <input type="number" id="input-consumption-num" class="control-number-input" min="500" max="200000" step="500" value="${this.state.monthlyConsumptionKwh}" />
+              <input type="range" id="input-consumption-slider" class="control-slider" min="1000" max="400000" step="1000" value="${this.state.monthlyConsumptionKwh}" />
+              <input type="number" id="input-consumption-num" class="control-number-input" min="500" max="600000" step="1000" value="${this.state.monthlyConsumptionKwh}" />
               <span class="control-unit">kWh</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:6px;">
+              <button type="button" id="btn-quick-scen-b" class="btn btn-outline btn-sm" style="flex:1;font-size:10px;padding:3px 6px;">
+                B안: 135,866 kWh (기숙사 제외)
+              </button>
+              <button type="button" id="btn-quick-scen-a" class="btn btn-outline btn-sm" style="flex:1;font-size:10px;padding:3px 6px;">
+                A안: 271,627 kWh (표 원본)
+              </button>
             </div>
           </div>
 
@@ -382,6 +402,25 @@ export class SolarSimulator {
       consSlider.value = this.state.monthlyConsumptionKwh;
       this.update();
     });
+
+    const btnScenB = this.container.querySelector("#btn-quick-scen-b");
+    if (btnScenB) {
+      btnScenB.addEventListener("click", () => {
+        this.state.monthlyConsumptionKwh = 135866;
+        consSlider.value = 135866;
+        consNum.value = 135866;
+        this.update();
+      });
+    }
+    const btnScenA = this.container.querySelector("#btn-quick-scen-a");
+    if (btnScenA) {
+      btnScenA.addEventListener("click", () => {
+        this.state.monthlyConsumptionKwh = 271627;
+        consSlider.value = 271627;
+        consNum.value = 271627;
+        this.update();
+      });
+    }
 
     // 7. 테이블 토글
     const tableWrap = this.container.querySelector("#sim-table-container");
